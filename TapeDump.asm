@@ -4,8 +4,8 @@
 ; INES header setup
         .inesprg    2
         .ineschr    1
-        .inesmir    0
-        .inesmap    0
+        .inesmir    2
+        .inesmap    5
 
 
 RAM_Code = $0140		;This is really low in RAM!
@@ -53,12 +53,13 @@ Mapper_UXROM: incbin "Mappers\UNROM.bin"
 Mapper_CNROM: incbin "Mappers\CNROM.bin"
 Mapper_TXROM: incbin "Mappers\TXROM1.bin"
 Mapper_AXROM: incbin "Mappers\AXROM.bin"
+Mapper_EWROM: incbin "Mappers\EWROM.bin"
 Mapper_VRC4:  incbin "Mappers\VRC4.BIN"
 Mapper_VRC6:  incbin "Mappers\VRC6.BIN"
 Mapper_FDS:   incbin "Mappers\FDS.BIN"
 
 Mapper_Add: .dw Mapper_NROM,Mapper_SXROM,Mapper_UXROM,Mapper_CNROM
-	    .dw Mapper_TXROM,Mapper_AXROM
+	    .dw Mapper_TXROM,Mapper_EWROM,Mapper_AXROM
 	.dw Mapper_VRC4,Mapper_VRC4,Mapper_VRC4,Mapper_VRC4
 	.dw Mapper_VRC4,Mapper_VRC4,Mapper_VRC4
 	.dw Mapper_VRC6,Mapper_VRC6,Mapper_FDS
@@ -77,6 +78,7 @@ Mapper_List:	.db 0,"0  NROM        "
 		.db 2,"2  UXROM       "
 		.db 3,"3  CNROM       "
 		.db 4,"4  TXROM (MMC3)"
+		.db 5,"5  MMC5 SRAM   "
 		.db 7,"7  AXROM (RARE)"
 	    .db 22,$81,"22 KONAMIVRC2A"
 	    .db 23,$82,"23 KONAMIVRC2B"
@@ -156,6 +158,27 @@ Reset_SUB
 	sta	<PPU2000
 	sta	$2001
 	sta	<PPU2001
+
+	LDX #$00 ; dmc intturpt stop
+	STX $4010
+	STX $5200 ; vscroll
+	STX $5204 ; scanline irq disable
+	STX $5010 ; MMC5 PCM irq disable
+	STX $5015 ; MMC5 pluse disable
+	STX $5130 ; upper char bank 0
+	STX $5100 ; PRG mode 0 32k bank
+	STX $5113 ; PRG-RAM bank
+	LDX #$50
+	STX $5105 ; nametable mode
+	
+	LDX #$00
+	STX $5101 ; 8kx1 chr window
+	; LDX #$00
+	; STX $5123 ; chr window1 
+	; LDX #$02
+	STX $5127 ; chr window2
+	LDX #$81
+	STX $5117 ; PRG bank 0
 
 waitvb1:	lda	$2002		;Wait for VBlank
 	bpl	waitvb1
