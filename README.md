@@ -10,4 +10,4 @@ To dump MMC5 savedata, select PRG dumping.
 
 ----
 
-This fork used [MS-DOS Player|http://takeda-toshiya.my.coocan.jp/msdos/] converter to get working 16-bit EXE files.
+This fork used [MS-DOS Player](http://takeda-toshiya.my.coocan.jp/msdos/) converter to get working 16-bit EXE files.
